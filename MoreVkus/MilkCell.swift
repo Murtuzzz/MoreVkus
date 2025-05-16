@@ -236,7 +236,7 @@ final class ProductsCollectionCell: UICollectionViewCell {
         removeButton.addTarget(self, action: #selector(minusButtonTapped), for: .touchUpInside)
     }
 
-    func configure(with item: CardInfo) {
+    func configure(with item: CardInfo, shouldHideAddButton: Bool = false) {
         container.image = UIImage(named: item.image)
         titleLabel.text = item.title
         priceLabel.text = "\(item.price) ₽"
@@ -256,6 +256,14 @@ final class ProductsCollectionCell: UICollectionViewCell {
             removeButton.alpha = 0
             prodCountLabel.alpha = 0
             basketView.alpha = 0
+        }
+        
+        hideAddButton(shouldHideAddButton)
+        
+        if shouldHideAddButton && item.prodCount > 0 {
+            addMaxQuantityLabel()
+        } else {
+            removeMaxQuantityLabel()
         }
     }
 
@@ -286,6 +294,37 @@ final class ProductsCollectionCell: UICollectionViewCell {
         removeButton.alpha = 0
         prodCountLabel.alpha = 0
         basketView.alpha = 0
+    }
+
+    func hideAddButton(_ hide: Bool) {
+        addButton.isHidden = hide
+        addButton.isEnabled = !hide
+    }
+
+    private var maxQuantityLabel: UILabel?
+
+    private func addMaxQuantityLabel() {
+        if maxQuantityLabel == nil {
+            let label = UILabel()
+            label.translatesAutoresizingMaskIntoConstraints = false
+            label.text = "Макс."
+            label.font = R.Fonts.avenirBook(with: 10)
+            label.textColor = .systemGray
+            label.textAlignment = .center
+            contentView.addSubview(label)
+            
+            NSLayoutConstraint.activate([
+                label.centerXAnchor.constraint(equalTo: addButton.centerXAnchor),
+                label.centerYAnchor.constraint(equalTo: addButton.centerYAnchor),
+            ])
+            
+            maxQuantityLabel = label
+        }
+        maxQuantityLabel?.isHidden = false
+    }
+
+    private func removeMaxQuantityLabel() {
+        maxQuantityLabel?.isHidden = true
     }
 }
 

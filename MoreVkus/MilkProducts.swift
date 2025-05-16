@@ -494,7 +494,7 @@ class ProductsController: UIViewController, UICollectionViewDelegate, UICollecti
                 // Обновляем ячейку, если она видима
                 if let cell = collectionView.cellForItem(at: IndexPath(item: index, section: 0)) as? ProductsCollectionCell {
                     cell.configure(with: cardsData[index])
-                } else {
+            } else {
                     // Если хотя бы одна ячейка не видна, потребуется полная перезагрузка
                     needReload = true
                 }
@@ -503,7 +503,7 @@ class ProductsController: UIViewController, UICollectionViewDelegate, UICollecti
         
         // Перезагружаем коллекцию только если нужно (невидимые ячейки изменились)
         if needReload {
-            collectionView.reloadData()
+        collectionView.reloadData()
         }
     }
 
@@ -564,26 +564,52 @@ extension ProductsController: CellDelegate, BasketCellDelegate {
         updatedItem.prodCount = quantity
         updatedItem.isInBasket = quantity > 0
         
-        // Configure cell with updated item
-        cell.configure(with: updatedItem)
+        // Проверяем, достигнуто ли максимальное количество
+        let isMaxQuantityReached = quantity >= item.productCount
+        
+        // Configure cell with updated item and max quantity info
+        cell.configure(with: updatedItem, shouldHideAddButton: isMaxQuantityReached)
         
         // ВАЖНО: Не захватываем updatedItem в замыкании, вместо этого используем productId
         let productId = updatedItem.prodId
         
         cell.onPlusTap = { [weak self] in
-            // Получаем актуальное количество продукта прямо перед изменением
+            guard let self = self else { return }
+            
+            // Получаем актуальное количество продукта и максимально доступное количество
             let currentQuantity = BasketManager.shared.quantityForProduct(productId: productId)
-            BasketManager.shared.updateQuantity(productId: productId, quantity: currentQuantity + 1)
+            let maxAvailableQuantity = self.displayDataSource[indexPath.item].productCount
+            
+            // Проверяем, не превышает ли текущее количество максимально доступное
+            if currentQuantity < maxAvailableQuantity {
+                BasketManager.shared.updateQuantity(
+                    productId: productId, 
+                    quantity: currentQuantity + 1,
+                    maxAvailable: maxAvailableQuantity
+                )
+                
+                // Если после обновления достигнуто максимальное количество, обновляем UI ячейки
+                if currentQuantity + 1 >= maxAvailableQuantity {
+                    cell.hideAddButton(true)
+                }
+            }
         }
         
         cell.onMinusTap = { [weak self] in
             // Получаем актуальное количество продукта прямо перед изменением
             let currentQuantity = BasketManager.shared.quantityForProduct(productId: productId)
+            let maxAvailableQuantity = self?.displayDataSource[indexPath.item].productCount ?? 0
+            
             if currentQuantity > 0 {
                 if currentQuantity == 1 {
                     BasketManager.shared.removeFromBasket(productId: productId)
                 } else {
                     BasketManager.shared.updateQuantity(productId: productId, quantity: currentQuantity - 1)
+                }
+                
+                // Если после уменьшения количество стало меньше максимального, показываем кнопку плюс
+                if currentQuantity >= maxAvailableQuantity {
+                    cell.hideAddButton(false)
                 }
             }
         }
@@ -613,15 +639,28 @@ extension ProductsController: CellDelegate, BasketCellDelegate {
        
        let item = displayDataSource[indexPath.item]
        let productId = item.prodId
+       let maxAvailableQuantity = item.productCount
        
-       // Получаем текущее количество и увеличиваем на 1
+       // Получаем текущее количество и увеличиваем на 1, если не превышает максимум
        let currentQuantity = BasketManager.shared.quantityForProduct(productId: productId)
+       
        if currentQuantity == 0 {
-           // Если товара еще нет в корзине, добавляем его
+           // Если товара еще нет в корзине, добавляем его с проверкой максимального количества
            BasketManager.shared.addToBasket(product: item, quantity: 1)
-       } else {
-           // Если товар уже есть, увеличиваем на 1
-           BasketManager.shared.updateQuantity(productId: productId, quantity: currentQuantity + 1)
+       } else if currentQuantity < maxAvailableQuantity {
+           // Если товар уже есть и не достигнут максимум, увеличиваем на 1
+           BasketManager.shared.updateQuantity(
+               productId: productId, 
+               quantity: currentQuantity + 1,
+               maxAvailable: maxAvailableQuantity
+           )
+       }
+       
+       // Обновляем UI ячейки если достигнуто максимальное количество
+       if currentQuantity + 1 >= maxAvailableQuantity {
+           if let productCell = cell as? ProductsCollectionCell {
+               productCell.hideAddButton(true)
+           }
        }
     }
 }

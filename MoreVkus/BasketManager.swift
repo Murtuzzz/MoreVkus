@@ -70,7 +70,7 @@ class BasketManager {
     }
     
     // Update quantity for a product
-    func updateQuantity(productId: Int, quantity: Int) {
+    func updateQuantity(productId: Int, quantity: Int, maxAvailable: Int? = nil) {
         guard quantity >= 0 else { return }
         
         if quantity == 0 {
@@ -78,21 +78,30 @@ class BasketManager {
             return
         }
         
-        basketItems[productId] = quantity
+        // Если указано максимальное количество, проверяем, не превышает ли новое количество максимальное
+        if let maxAvailable = maxAvailable, quantity > maxAvailable {
+            // Если превышает, устанавливаем максимальное количество
+            basketItems[productId] = maxAvailable
+        } else {
+            basketItems[productId] = quantity
+        }
         
         // Update basketInfoArray
         if let index = basketInfoArray.firstIndex(where: { !$0.isEmpty && $0[0].id == productId }) {
             let currentInfo = basketInfoArray[index][0]
+            let finalQuantity = basketItems[productId] ?? quantity
+            let maxCount = maxAvailable ?? currentInfo.prodCount
+            
             basketInfoArray[index] = [
                 BasketInfo(
                     title: currentInfo.title,
                     price: currentInfo.price,
-                    quantity: quantity,
+                    quantity: finalQuantity,
                     id: currentInfo.id,
                     inBasket: true,
                     catId: currentInfo.catId,
                     inStock: currentInfo.inStock,
-                    prodCount: quantity
+                    prodCount: maxCount
                 )
             ]
         }
@@ -103,7 +112,7 @@ class BasketManager {
         // Post notification
         let userInfo: [String: Any] = [
             "productId": productId,
-            "quantity": quantity,
+            "quantity": basketItems[productId] ?? quantity,
             "action": "update"
         ]
         NotificationCenter.default.post(name: Notification.Name(BasketManager.productQuantityChangedNotification), object: nil, userInfo: userInfo)
@@ -176,7 +185,7 @@ class BasketManager {
                     inBasket: true,
                     catId: product.catId,
                     inStock: product.inStock,
-                    prodCount: quantity
+                    prodCount: product.productCount
                 )
             ]
         } else {
@@ -195,7 +204,7 @@ class BasketManager {
                             inBasket: true,
                             catId: product.catId,
                             inStock: product.inStock,
-                            prodCount: quantity
+                            prodCount: product.productCount
                         )
                     ]
                     addedToExistingSlot = true
@@ -214,7 +223,7 @@ class BasketManager {
                         inBasket: true,
                         catId: product.catId,
                         inStock: product.inStock,
-                        prodCount: quantity
+                        prodCount: product.productCount
                     )
                 ])
             }

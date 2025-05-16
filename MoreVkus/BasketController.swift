@@ -171,28 +171,53 @@ class BasketController: UIViewController, UITableViewDelegate, UITableViewDataSo
         
         if !basketItems[indexPath.row].isEmpty {
             let item = basketItems[indexPath.row][0]
-            cell.configure(with: item)
+            
+            // Проверяем, достигнуто ли максимальное количество
+            let isMaxReached = item.quantity >= item.prodCount
+            
+            // Настраиваем ячейку с учетом максимального количества
+            cell.configure(with: item, shouldHideIncreaseButton: isMaxReached)
             
             // Add quantity change handlers
             cell.onIncrease = { [weak self] in
                 // Сохраняем ID продукта, чтобы получить актуальное состояние
                 let productId = item.id
-                // Получаем актуальное количество продукта непосредственно перед изменением
+                // Получаем актуальное количество продукта и максимальное доступное количество
                 let currentQuantity = BasketManager.shared.quantityForProduct(productId: productId)
-                // Увеличиваем количество на 1
-                BasketManager.shared.updateQuantity(productId: productId, quantity: currentQuantity + 1)
+                let maxAvailableQuantity = item.prodCount
+                
+                // Увеличиваем только если не достигнут максимум
+                if currentQuantity < maxAvailableQuantity {
+                    BasketManager.shared.updateQuantity(
+                        productId: productId, 
+                        quantity: currentQuantity + 1,
+                        maxAvailable: maxAvailableQuantity
+                    )
+                    
+                    // Если после обновления достигнут максимум, скрываем кнопку
+                    if currentQuantity + 1 >= maxAvailableQuantity {
+                        cell.hideIncreaseButton(true)
+                    }
+                }
+                
                 self?.updateTotalPrice()
             }
             
             cell.onDecrease = { [weak self] in
                 // Сохраняем ID продукта, чтобы получить актуальное состояние
                 let productId = item.id
-                // Получаем актуальное количество продукта непосредственно перед изменением
+                // Получаем актуальное количество продукта и максимальное доступное количество
                 let currentQuantity = BasketManager.shared.quantityForProduct(productId: productId)
+                let maxAvailableQuantity = item.prodCount
                 
                 if currentQuantity > 1 {
                     // Если количество больше 1, уменьшаем на 1
                     BasketManager.shared.updateQuantity(productId: productId, quantity: currentQuantity - 1)
+                    
+                    // Показываем кнопку увеличения, если она была скрыта
+                    if currentQuantity >= maxAvailableQuantity {
+                        cell.hideIncreaseButton(false)
+                    }
                 } else {
                     // Если количество равно 1, удаляем товар
                     BasketManager.shared.removeFromBasket(productId: productId)
@@ -236,7 +261,7 @@ class BasketCell: UITableViewCell {
     
     private let productImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFit
+        imageView.contentMode = .scaleAspectFill
         imageView.backgroundColor = .white
         imageView.layer.cornerRadius = 8
         imageView.clipsToBounds = true
@@ -326,7 +351,7 @@ class BasketCell: UITableViewCell {
             containerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
             
             productImageView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 8),
-            productImageView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 8),
+            productImageView.leadingAnchor.constraint(equalTo: removeButton.trailingAnchor, constant: 8),
             productImageView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -8),
             productImageView.widthAnchor.constraint(equalToConstant: 80),
             
@@ -337,24 +362,44 @@ class BasketCell: UITableViewCell {
             priceLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 4),
             priceLabel.leadingAnchor.constraint(equalTo: productImageView.trailingAnchor, constant: 12),
             
-            decreaseButton.leadingAnchor.constraint(equalTo: productImageView.trailingAnchor, constant: 12),
-            decreaseButton.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -12),
-            decreaseButton.widthAnchor.constraint(equalToConstant: 30),
-            decreaseButton.heightAnchor.constraint(equalToConstant: 30),
+//            decreaseButton.leadingAnchor.constraint(equalTo: productImageView.trailingAnchor, constant: 12),
+//            decreaseButton.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -12),
+//            decreaseButton.widthAnchor.constraint(equalToConstant: 30),
+//            decreaseButton.heightAnchor.constraint(equalToConstant: 30),
             
-            quantityLabel.centerYAnchor.constraint(equalTo: decreaseButton.centerYAnchor),
-            quantityLabel.leadingAnchor.constraint(equalTo: decreaseButton.trailingAnchor, constant: 8),
-            quantityLabel.widthAnchor.constraint(equalToConstant: 30),
+//            quantityLabel.centerYAnchor.constraint(equalTo: decreaseButton.centerYAnchor),
+//            quantityLabel.leadingAnchor.constraint(equalTo: decreaseButton.trailingAnchor, constant: 8),
+//            quantityLabel.widthAnchor.constraint(equalToConstant: 30),
+            
+            quantityLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -40),
+            quantityLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
+            quantityLabel.widthAnchor.constraint(equalToConstant: 50),
+            quantityLabel.heightAnchor.constraint(equalToConstant: 24),
+            
+//            increaseButton.leadingAnchor.constraint(equalTo: quantityLabel.trailingAnchor, constant: 8),
+//            increaseButton.centerYAnchor.constraint(equalTo: decreaseButton.centerYAnchor),
+//            increaseButton.widthAnchor.constraint(equalToConstant: 30),
+//            increaseButton.heightAnchor.constraint(equalToConstant: 30),
+            
+//            removeButton.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 8),
+//            removeButton.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -8),
+//            removeButton.widthAnchor.constraint(equalToConstant: 30),
+//            removeButton.heightAnchor.constraint(equalToConstant: 30),
             
             increaseButton.leadingAnchor.constraint(equalTo: quantityLabel.trailingAnchor, constant: 8),
-            increaseButton.centerYAnchor.constraint(equalTo: decreaseButton.centerYAnchor),
-            increaseButton.widthAnchor.constraint(equalToConstant: 30),
-            increaseButton.heightAnchor.constraint(equalToConstant: 30),
+            increaseButton.centerYAnchor.constraint(equalTo: centerYAnchor),
+            increaseButton.widthAnchor.constraint(equalToConstant: 20),
+            increaseButton.heightAnchor.constraint(equalTo: increaseButton.widthAnchor),
             
-            removeButton.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 8),
-            removeButton.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -8),
-            removeButton.widthAnchor.constraint(equalToConstant: 30),
-            removeButton.heightAnchor.constraint(equalToConstant: 30)
+            decreaseButton.trailingAnchor.constraint(equalTo: quantityLabel.leadingAnchor, constant: -8),
+            decreaseButton.centerYAnchor.constraint(equalTo: centerYAnchor),
+            decreaseButton.widthAnchor.constraint(equalToConstant: 20),
+            decreaseButton.heightAnchor.constraint(equalTo: decreaseButton.widthAnchor),
+            
+            removeButton.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            removeButton.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 8),
+            removeButton.heightAnchor.constraint(equalToConstant: 16),
+            removeButton.widthAnchor.constraint(equalToConstant: 16),
         ])
         
         // Add button actions
@@ -363,7 +408,7 @@ class BasketCell: UITableViewCell {
         removeButton.addTarget(self, action: #selector(removeButtonTapped), for: .touchUpInside)
     }
     
-    func configure(with item: BasketInfo) {
+    func configure(with item: BasketInfo, shouldHideIncreaseButton: Bool = false) {
         titleLabel.text = item.title
         priceLabel.text = "\(String(format: "%.2f", item.price)) ₽"
         quantityLabel.text = "\(item.quantity)"
@@ -376,6 +421,51 @@ class BasketCell: UITableViewCell {
             // Используем случайное изображение из ресурсов "food1", "food2", и т.д.
             productImageView.image = UIImage(named: "food\(Int.random(in: 1...5))") 
         }
+        
+        // Настраиваем кнопку увеличения
+        hideIncreaseButton(shouldHideIncreaseButton)
+    }
+    
+    // Добавляем метод для скрытия/показа кнопки увеличения
+    func hideIncreaseButton(_ hide: Bool) {
+        increaseButton.isHidden = hide
+        increaseButton.isEnabled = !hide
+        
+        // Добавляем индикатор максимального количества, если кнопка скрыта
+        if hide {
+            addMaxQuantityLabel()
+        } else {
+            removeMaxQuantityLabel()
+        }
+    }
+    
+    // Максимальное количество товара достигнуто
+    private var maxQuantityLabel: UILabel?
+    
+    // Метод для добавления индикатора максимального количества
+    private func addMaxQuantityLabel() {
+        if maxQuantityLabel == nil {
+            let label = UILabel()
+            label.translatesAutoresizingMaskIntoConstraints = false
+            label.text = "Макс."
+            label.font = R.Fonts.avenirBook(with: 10)
+            label.textColor = .systemGray
+            label.textAlignment = .center
+            containerView.addSubview(label)
+            
+            NSLayoutConstraint.activate([
+                label.centerXAnchor.constraint(equalTo: increaseButton.centerXAnchor),
+                label.centerYAnchor.constraint(equalTo: increaseButton.centerYAnchor),
+            ])
+            
+            maxQuantityLabel = label
+        }
+        maxQuantityLabel?.isHidden = false
+    }
+    
+    // Метод для удаления индикатора максимального количества
+    private func removeMaxQuantityLabel() {
+        maxQuantityLabel?.isHidden = true
     }
     
     @objc private func increaseButtonTapped() {
