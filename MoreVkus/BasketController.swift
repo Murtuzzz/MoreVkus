@@ -283,6 +283,7 @@ class BasketController: UIViewController, UITableViewDelegate, UITableViewDataSo
             let deliveryController = DeliveryController()
             navigationController?.pushViewController(deliveryController, animated: true)
             UserSettings.orderPaid = true
+            UserSettings.orderDelivered = false 
         }
     }
     

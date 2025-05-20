@@ -157,7 +157,7 @@ class CatalogController: UIViewController {
         setupUI()
         setupNotifications()
         UserSettings.orderDelivered = true
-        UserSettings.orderCanceled = false
+       
         
         if UserSettings.orderDelivered == nil {
             UserSettings.orderDelivered = true
@@ -169,6 +169,12 @@ class CatalogController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         updateBasketIndicator()
+        
+        print("orderCanceled1 = \(UserSettings.orderCanceled)")
+        if UserSettings.orderCanceled == true {
+            UserSettings.orderCanceled = false
+            print("orderCanceled2 = \(UserSettings.orderCanceled)")
+        }
         
 //        if UserSettings.orderDelivered {
 //            deliveryButton.alpha = 0

@@ -51,6 +51,7 @@ class UserSettings {
         case orderPaid
         case orderInfo
         case activeOrder
+        case orderCanceled
         case orderSum
         case ordersHistory
         case userLocation
@@ -229,11 +230,11 @@ class UserSettings {
     
     static var orderCanceled: Bool! {
         get {
-            return UserDefaults.standard.bool(forKey: SettingsKeys.activeOrder.rawValue)
+            return UserDefaults.standard.bool(forKey: SettingsKeys.orderCanceled.rawValue)
         } set {
             
             let defaults = UserDefaults.standard
-            let key = SettingsKeys.activeOrder.rawValue
+            let key = SettingsKeys.orderCanceled.rawValue
             if let today = newValue {
                 defaults.set(today, forKey: key)
             } else {
