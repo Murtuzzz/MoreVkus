@@ -27,29 +27,23 @@ class CatalogController: UIViewController {
         return button
     }()
     
-    private let profileButton: UIButton = {
-        let button = UIButton(type: .system)
+    private var profileButton: UIButton = {
+        var config = UIButton.Configuration.plain()
+        config.title = "Войти"
+        
+        // Установка изображения с нужным размером
+        let imageConfig = UIImage.SymbolConfiguration(pointSize: 18, weight: .regular)
+        config.image = UIImage(systemName: "person", withConfiguration: imageConfig)
+        
+        // Расстояние между текстом и картинкой
+        config.imagePadding = 8
+        config.baseForegroundColor = .black
+
+        let button = UIButton(configuration: config)
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.backgroundColor = .clear
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 20) // Этот параметр сейчас игнорируется, шрифт задается через configuration
+        
         return button
-    }()
-    
-    private let profileImage: UIImageView = {
-        let view = UIImageView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.image = UIImage(systemName: "person")
-        view.contentMode = .scaleAspectFit
-        return view
-    }()
-    
-    private var profileLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.textAlignment = .left
-        label.textColor = .black
-        label.text = "Войти"
-        label.font = R.Fonts.avenirBook(with: 16)
-        return label
     }()
     
     private var basketItemCountLabel: UILabel = {
@@ -68,13 +62,17 @@ class CatalogController: UIViewController {
     }()
     
     private let deliveryButton: UIButton = {
-        let button = UIButton()
+        let button = UIButton(type: .system)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setImage(UIImage(systemName: "truck.box.badge.clock"), for: .normal)
-        button.tintColor = .white
+        button.tintColor = .black
         button.layer.cornerRadius = 22
-        button.backgroundColor = R.Colors.barBg.withAlphaComponent(0.5)
-        button.alpha = 0
+        button.backgroundColor = .white
+        button.layer.shadowColor = UIColor.systemGray3.cgColor
+        button.layer.shadowOpacity = 0.5;
+        button.layer.shadowRadius = 5.0;
+        button.layer.shadowOffset = CGSizeMake(4, 4);
+        button.alpha = 1
         return button
     }()
     
@@ -158,6 +156,12 @@ class CatalogController: UIViewController {
 
         setupUI()
         setupNotifications()
+        UserSettings.orderDelivered = true
+        UserSettings.orderCanceled = false
+        
+        if UserSettings.orderDelivered == nil {
+            UserSettings.orderDelivered = true
+        }
         
         title = "Каталог"
     }
@@ -165,6 +169,18 @@ class CatalogController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         updateBasketIndicator()
+        
+//        if UserSettings.orderDelivered {
+//            deliveryButton.alpha = 0
+//        } else {
+//            deliveryButton.alpha = 1
+//        }
+//        
+//        if UserSettings.orderCanceled {
+//            deliveryButton.alpha = 0
+//        } else {
+//            deliveryButton.alpha = 1
+//        }
     }
     
     private func setupUI() {
@@ -181,11 +197,11 @@ class CatalogController: UIViewController {
         //middleView.addSubview(sweetsCollection)
         //middleView.addSubview(sweetsLabel)
         view.addSubview(basketView)
+        view.addSubview(deliveryButton)
         view.addSubview(basketButton)
         view.addSubview(profileView)
         view.addSubview(basketItemCountLabel)
-        view.addSubview(profileImage)
-        view.addSubview(profileLabel)
+        view.addSubview(profileButton)
         view.addSubview(profileButton)
 
         contentView.addSubview(middleView)
@@ -197,6 +213,16 @@ class CatalogController: UIViewController {
         if UserSettings.userLocation == nil {
             UserSettings.userLocation = [:]
         }
+        
+        deliveryButton.addTarget(self, action: #selector(deilveryButtonAction), for: .touchUpInside)
+    }
+    
+    @objc
+    func deilveryButtonAction() {
+        //let vc = DeliveryViewController()
+        let vc = DeliveryController()
+        //present(vc, animated: true)
+        navigationController?.pushViewController(vc, animated: true)
     }
     
     private func setupNotifications() {
@@ -275,15 +301,6 @@ class CatalogController: UIViewController {
             
 //            sweetsLabel.leadingAnchor.constraint(equalTo: middleView.leadingAnchor, constant: 16),
 //            sweetsLabel.topAnchor.constraint(equalTo: recomendationCollection.bottomAnchor),
-//
-            
-            profileImage.centerYAnchor.constraint(equalTo: profileView.centerYAnchor),
-            profileImage.leadingAnchor.constraint(equalTo: profileView.leadingAnchor, constant: 24),
-            profileImage.heightAnchor.constraint(equalToConstant: 24),
-            profileImage.widthAnchor.constraint(equalToConstant: 24),
-            
-            profileLabel.leadingAnchor.constraint(equalTo: profileImage.trailingAnchor, constant: 8),
-            profileLabel.centerYAnchor.constraint(equalTo: profileView.centerYAnchor),
             
             basketView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
             basketView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: -16),
@@ -293,12 +310,17 @@ class CatalogController: UIViewController {
             profileView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
             profileView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 16),
             profileView.heightAnchor.constraint(equalToConstant: 56),
-            profileView.widthAnchor.constraint(equalToConstant: 160),
+            profileView.widthAnchor.constraint(equalToConstant: 136),
             
-            profileButton.widthAnchor.constraint(equalToConstant: 160),
+            profileButton.widthAnchor.constraint(equalToConstant: 136),
             profileButton.heightAnchor.constraint(equalToConstant: 56),
-            profileButton.leadingAnchor.constraint(equalTo: profileImage.leadingAnchor),
+            profileButton.leadingAnchor.constraint(equalTo: profileView.leadingAnchor),
             profileButton.centerYAnchor.constraint(equalTo: profileView.centerYAnchor),
+            
+            deliveryButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            deliveryButton.centerYAnchor.constraint(equalTo: basketButton.centerYAnchor),
+            deliveryButton.heightAnchor.constraint(equalToConstant: 56),
+            deliveryButton.widthAnchor.constraint(equalTo: deliveryButton.heightAnchor),
             
             discountCollection.topAnchor.constraint(equalTo: middleView.topAnchor, constant: 104),
             discountCollection.leadingAnchor.constraint(equalTo: middleView.leadingAnchor,constant: 8),

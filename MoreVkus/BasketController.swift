@@ -194,12 +194,11 @@ class BasketController: UIViewController, UITableViewDelegate, UITableViewDataSo
     func saveLocationButtonAction() {
         let vc = MapViewController()
         navigationController?.pushViewController(vc, animated: true)
-//        let navigationController = UINavigationController(rootViewController: vc)
-//        navigationController.modalPresentationStyle = .fullScreen
-//        present(navigationController, animated: true)
-//
-        vc.locationPick = {
-            self.locationLabel.text = UserSettings.userLocation!["Location"]
+        
+        vc.locationPick = { [weak self] in
+            self?.locationLabel.text = UserSettings.userLocation!["Location"]
+            // Закрываем MapViewController после выбора локации
+            self?.navigationController?.popViewController(animated: true)
         }
     }
     
@@ -234,17 +233,57 @@ class BasketController: UIViewController, UITableViewDelegate, UITableViewDataSo
     }
     
     @objc private func checkoutButtonTapped() {
-        // This would typically navigate to the checkout screen
-        // For now, let's just show an alert
-        print("Заказ = \(UserSettings.basketInfo ?? [])")
-        
-        let alert = UIAlertController(
-            title: "Оформление заказа",
-            message: "Функционал оформления заказа будет доступен позже",
-            preferredStyle: .alert
-        )
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
-        present(alert, animated: true)
+        print(UserSettings.orderDelivered)
+        if UserSettings.orderDelivered == false {
+            let alert = UIAlertController(
+                title: "Обработка",
+                message: "Дождитесь завершения предыдущего заказа",
+                preferredStyle: .alert
+            )
+            alert.addAction(UIAlertAction(title: "OK", style: .default))
+            present(alert, animated: true)
+        } else {
+            // Проверяем, выбран ли адрес доставки
+            guard let location = UserSettings.userLocation?["Location"], !location.isEmpty else {
+                let alert = UIAlertController(
+                    title: "Ошибка",
+                    message: "Пожалуйста, выберите адрес доставки",
+                    preferredStyle: .alert
+                )
+                alert.addAction(UIAlertAction(title: "OK", style: .default))
+                present(alert, animated: true)
+                return
+            }
+            
+            // Проверяем, есть ли товары в корзине
+            guard !basketItems.isEmpty else {
+                let alert = UIAlertController(
+                    title: "Ошибка",
+                    message: "Корзина пуста",
+                    preferredStyle: .alert
+                )
+                alert.addAction(UIAlertAction(title: "OK", style: .default))
+                present(alert, animated: true)
+                return
+            }
+            
+            // Сохраняем информацию о заказе
+            UserSettings.orderSum = BasketManager.shared.totalPrice()
+            if let basketInfo = UserSettings.basketInfo {
+                UserSettings.orderInfo = basketInfo
+                //UserSettings.orderDelivered = false
+                //UserSettings.orderCanceled = false
+            }
+            
+            // Очищаем корзину
+            BasketManager.shared.clearBasket()
+            
+            // Открываем экран информации о доставке
+            
+            let deliveryController = DeliveryController()
+            navigationController?.pushViewController(deliveryController, animated: true)
+            UserSettings.orderPaid = true
+        }
     }
     
     // MARK: - UITableViewDataSource
@@ -470,6 +509,7 @@ class BasketCell: UITableViewCell {
             removeButton.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 8),
             removeButton.heightAnchor.constraint(equalToConstant: 16),
             removeButton.widthAnchor.constraint(equalToConstant: 16),
+            
         ])
         
         // Add button actions
@@ -561,4 +601,4 @@ class BasketCell: UITableViewCell {
         onDecrease = nil
         onRemove = nil
     }
-} 
+}

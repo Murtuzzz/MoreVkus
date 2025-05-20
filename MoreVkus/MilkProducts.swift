@@ -161,19 +161,14 @@ class ProductsController: UIViewController, UICollectionViewDelegate, UICollecti
         // Show activity indicator
         activityIndicator.startAnimating()
         
-        // Define URLs to try
-        let urlsToTry = [
-            "http://localhost:5002/get-url",      // When testing on simulator
-            "http://localhost:5002/api/products", // Alternative endpoint
-            "http://127.0.0.1:5002/get-url",      // Alternative localhost
-            "http://127.0.0.1:5002/api/products", // Alternative endpoint with 127.0.0.1
-            "http://10.0.2.2:5002/get-url",       // Special IP for Android emulator to access host
-            "http://10.0.2.2:5002/api/products",  // Alternative endpoint for Android emulator host
-            "http://192.168.0.111:5002/get-url"   // Your specific IP from previous try
+        // Список URL для попытки подключения
+        let urls = [
+            Config.getURL,      // Основной URL
+            Config.productsURL, // Альтернативный эндпоинт
         ]
         
         // Check direct URL access to each URL for debugging
-        for urlString in urlsToTry {
+        for urlString in urls {
             testDirectUrlAccess(url: urlString)
         }
         
@@ -182,7 +177,7 @@ class ProductsController: UIViewController, UICollectionViewDelegate, UICollecti
         printAvailableNetworkInterfaces()
         
         // Try all URLs sequentially until one works
-        tryNextUrl(urls: urlsToTry, index: 0)
+        tryNextUrl(urls: urls, index: 0)
     }
 
     private func tryNextUrl(urls: [String], index: Int) {

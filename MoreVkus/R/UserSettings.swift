@@ -40,7 +40,7 @@ struct Adress: Codable {
     var longitude: Double
 }
 
-final class UserSettings {
+class UserSettings {
     
     private enum SettingsKeys: String {
         case basketInfo
@@ -57,6 +57,7 @@ final class UserSettings {
         case isLocChanging
         case storeData
         case dataFromStore
+        case orderDelivered
         case currentController
     }
     
@@ -155,13 +156,13 @@ final class UserSettings {
         }
     }
     
-    static var activeOrder: Bool! {
+    static var orderDelivered: Bool! {
         get {
-            return UserDefaults.standard.bool(forKey: SettingsKeys.activeOrder.rawValue)
+            return UserDefaults.standard.bool(forKey: SettingsKeys.orderDelivered.rawValue)
         } set {
             
             let defaults = UserDefaults.standard
-            let key = SettingsKeys.activeOrder.rawValue
+            let key = SettingsKeys.orderDelivered.rawValue
             if let today = newValue {
                 defaults.set(today, forKey: key)
             } else {
@@ -182,6 +183,89 @@ final class UserSettings {
             } else {
                 defaults.removeObject(forKey: key)
             }
+        }
+    }
+    
+    static var orderSum: Double! {
+        get {
+            return UserDefaults.standard.double(forKey: SettingsKeys.orderSum.rawValue)
+        } set {
+            let defaults = UserDefaults.standard
+            let key = SettingsKeys.orderSum.rawValue
+            if let today = newValue {
+                defaults.set(today, forKey: key)
+            } else {
+                defaults.removeObject(forKey: key)
+            }
+        }
+    }
+    
+    static var ordersHistory: [[[BasketInfo]]]! {
+        get {
+            guard let data = UserDefaults.standard.data(forKey: SettingsKeys.ordersHistory.rawValue) else { return nil }
+            let decoder = JSONDecoder()
+            return try? decoder.decode([[[BasketInfo]]].self, from: data)
+        } set {
+            let encoder = JSONEncoder()
+            let encoded = try? encoder.encode(newValue)
+            UserDefaults.standard.set(encoded, forKey: SettingsKeys.ordersHistory.rawValue)
+        }
+    }
+    
+//    static var activeOrder: Bool! {
+//        get {
+//            return UserDefaults.standard.bool(forKey: SettingsKeys.activeOrder.rawValue)
+//        } set {
+//            
+//            let defaults = UserDefaults.standard
+//            let key = SettingsKeys.activeOrder.rawValue
+//            if let today = newValue {
+//                defaults.set(today, forKey: key)
+//            } else {
+//                defaults.removeObject(forKey: key)
+//            }
+//        }
+    //    }
+    
+    static var orderCanceled: Bool! {
+        get {
+            return UserDefaults.standard.bool(forKey: SettingsKeys.activeOrder.rawValue)
+        } set {
+            
+            let defaults = UserDefaults.standard
+            let key = SettingsKeys.activeOrder.rawValue
+            if let today = newValue {
+                defaults.set(today, forKey: key)
+            } else {
+                defaults.removeObject(forKey: key)
+            }
+        }
+    }
+    
+    static var orderPaid: Bool! {
+        get {
+            return UserDefaults.standard.bool(forKey: SettingsKeys.orderPaid.rawValue)
+        } set {
+            
+            let defaults = UserDefaults.standard
+            let key = SettingsKeys.orderPaid.rawValue
+            if let today = newValue {
+                defaults.set(today, forKey: key)
+            } else {
+                defaults.removeObject(forKey: key)
+            }
+        }
+    }
+    
+    static var orderInfo: [[BasketInfo]]! {
+        get {
+            guard let data = UserDefaults.standard.data(forKey: SettingsKeys.orderInfo.rawValue) else { return nil }
+            let decoder = JSONDecoder()
+            return try? decoder.decode([[BasketInfo]].self, from: data)
+        } set {
+            let encoder = JSONEncoder()
+            let encoded = try? encoder.encode(newValue)
+            UserDefaults.standard.set(encoded, forKey: SettingsKeys.orderInfo.rawValue)
         }
     }
     

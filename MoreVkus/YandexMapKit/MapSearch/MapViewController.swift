@@ -19,7 +19,7 @@ class MapViewController: UIViewController {
         let textAttributes = [NSAttributedString.Key.foregroundColor:UIColor.black]
         navigationController?.navigationBar.titleTextAttributes = textAttributes
         
-        let exitButton = UIBarButtonItem(title: "Закрыть", style: .plain, target: self, action: #selector(exitTapped))
+        let exitButton = UIBarButtonItem(title: "Назад", style: .plain, target: self, action: #selector(exitTapped))
           
           navigationItem.leftBarButtonItem = exitButton
         
@@ -39,7 +39,7 @@ class MapViewController: UIViewController {
     
     @objc
     func exitTapped() {
-        //navigationController?.popViewController(animated: true)
+        navigationController?.popViewController(animated: true)
     }
 
     // MARK: - Private methods
@@ -82,10 +82,8 @@ class MapViewController: UIViewController {
     }
 
     private func focusCamera(points: [YMKPoint], boundingBox: YMKBoundingBox) {
-        
         print("FOCUS")
         
-      
         if points.isEmpty {
             return
         }
@@ -101,12 +99,15 @@ class MapViewController: UIViewController {
 
         map.move(with: position, animation: YMKAnimation(type: .smooth, duration: 0.5))
       
-        UserSettings.userLocation?["latitude"] = "\(position.target.latitude)"
-        UserSettings.userLocation?["longitude"] = "\(position.target.longitude)"
-        
-        print("UserLocation = \(UserSettings.userLocation ?? [:])")
-        locationPick?()
-        navigationController?.popViewController(animated: true)
+        // Сохраняем координаты только если это не поисковый запрос
+        if !searchBarController.isActive {
+            UserSettings.userLocation?["latitude"] = "\(position.target.latitude)"
+            UserSettings.userLocation?["longitude"] = "\(position.target.longitude)"
+            
+            print("UserLocation = \(UserSettings.userLocation ?? [:])")
+            locationPick?()
+            navigationController?.popViewController(animated: true)
+        }
     }
 
     private func displaySearchResults(
@@ -171,6 +172,7 @@ extension MapViewController: UISearchResultsUpdating, UISearchControllerDelegate
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         searchViewModel.startSearch()
         searchBarController.searchBar.text = searchViewModel.mapUIState.query
+        
     }
 
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
@@ -223,13 +225,19 @@ extension MapViewController: UITableViewDelegate {
         let item = resultsTableController.items[indexPath.row]
         print("USER adress = \(item.title.text), USER city = \(item.subtitle?.text ?? "")")
      
-        
         let region = item.subtitle?.text.components(separatedBy: " ")
         
         if region?.last == "Алания" {
             let location = ("\(item.title.text), \(item.subtitle?.text ?? "")")
             UserSettings.userLocation?["Location"] = location
+            
+            // Вызываем onClick для поиска и фокусировки на выбранном месте
             item.onClick()
+            
+            // Закрываем контроллер после выбора адреса
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+                self?.navigationController?.popViewController(animated: true)
+            }
         } else {
             displayAdressAlert()
         }
