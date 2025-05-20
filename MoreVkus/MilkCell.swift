@@ -246,7 +246,7 @@ final class ProductsCollectionCell: UICollectionViewCell {
         
         if item.prodCount > 0 {
             basketButton.alpha = 0
-            addButton.alpha = item.inStock ? 1 : 0
+            addButton.alpha = (item.inStock && item.prodCount < item.productCount) ? 1 : 0
             removeButton.alpha = 1
             prodCountLabel.alpha = 1
             basketView.alpha = 1

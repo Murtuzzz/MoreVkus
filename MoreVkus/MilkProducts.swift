@@ -110,7 +110,8 @@ class ProductsController: UIViewController, UICollectionViewDelegate, UICollecti
 
 
     override func viewWillAppear(_ animated: Bool) {
-        print("-------------------------------ProductsController------------------------------------")
+        super.viewWillAppear(animated)
+        refreshAllProducts()
     }
 
     override func viewDidLoad() {
@@ -459,6 +460,9 @@ class ProductsController: UIViewController, UICollectionViewDelegate, UICollecti
             }
         }
         
+        // Обновляем displayDataSource
+        displayDataSource = cardsData
+        
         // Полностью обновляем коллекцию
         collectionView.reloadData()
     }
@@ -626,7 +630,12 @@ extension ProductsController: CellDelegate, BasketCellDelegate {
     }
 
     func infoButtonTapped(cell: UICollectionViewCell) {
+        guard let indexPath = collectionView.indexPath(for: cell),
+              indexPath.item < displayDataSource.count else { return }
        
+        let product = displayDataSource[indexPath.item]
+        let cardInfoController = CardInfoController(product: product)
+        navigationController?.pushViewController(cardInfoController, animated: true)
     }
     
     func didTapBasketButton(inCell cell: UICollectionViewCell) {
