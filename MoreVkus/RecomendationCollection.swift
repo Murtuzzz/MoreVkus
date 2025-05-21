@@ -39,8 +39,8 @@ final class RecomendationCollection: UIView, UICollectionViewDelegateFlowLayout,
         
         dataSource = [.init(title: "Рыба", image: UIImage(named: "frzFish")!, categoryId: 1),
                       .init(title: "Колбасы, сосиски",image: UIImage(named: "sosi")!,categoryId: 2),
-                      .init(title: "Полуфабрикаты", image: UIImage(named: "froz")!,categoryId: 3),
-                      .init(title: "Молочные продукты", image: UIImage(named: "milk")!,categoryId: 4),
+                      .init(title: "Молочные продукты", image: UIImage(named: "milk")!,categoryId: 3),
+                      .init(title: "Полуфабрикаты", image: UIImage(named: "froz")!,categoryId: 4),
                       .init(title: "Овощи", image: UIImage(named: "veget")!,categoryId: 5),
                       .init(title: "Напитки", image: UIImage(named: "drinks")!, categoryId: 6),
                       

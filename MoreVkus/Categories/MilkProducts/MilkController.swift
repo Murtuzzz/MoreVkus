@@ -1,23 +1,9 @@
 //
-//  ViewController.swift
-//  FishShop
+//  MilkController.swift
+//  MoreVkus
 //
-//  Created by Мурат Кудухов on 01.03.2024.
+//  Created by Мурат Кудухов on 21.05.2025.
 //
-
-struct CardInfo {
-    let image: String
-    let discription: String
-    let price: Int
-    let title: String
-    let prodId: Int
-    let catId: Int
-    let productCount: Int
-    let inStock: Bool
-    var prodCount: Int = 0
-    var isInBasket = false
-    var wasInBasket = false
-}
 
 import UIKit
 import SystemConfiguration
@@ -25,7 +11,7 @@ import Foundation
 import Darwin.POSIX.netdb
 import Darwin.POSIX.net
 
-class FishProducts: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+class MilkController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
 
     private var collectionView: UICollectionView!
     private var basketInfoArray: [[BasketInfo]] = []
@@ -55,7 +41,7 @@ class FishProducts: UIViewController, UICollectionViewDelegate, UICollectionView
 
     let jsonString = """
 [
-    {"id":1,"name":"Grilled fish","description":"Бекещеке","price":"199.00","in_stock":true,"product_count":23.0,"category":1},
+    {"id":1,"name":"Grilled ","description":"Бекещеке","price":"199.00","in_stock":true,"product_count":23.0,"category":1},
     {"id":2,"name":"Tasty salmon","description":"Бекещеке","price":"396.00","in_stock":true,"product_count":23.0,"category":1},
     {"id":3,"name":"Tasty frozen fish","description":"Бекещеке","price":"485.00","in_stock":true,"product_count":23.0,"category":2},
     {"id":4,"name":"Freeze fish","description":"Бекещеке","price":"390.00","in_stock":true,"product_count":23.0,"category":2},
@@ -136,7 +122,7 @@ class FishProducts: UIViewController, UICollectionViewDelegate, UICollectionView
         collectionView.backgroundColor = .clear
         collectionView.delegate = self
         collectionView.dataSource = self
-        collectionView.register(FishCollectionCell.self, forCellWithReuseIdentifier: FishCollectionCell.id)
+        collectionView.register(MilkCollectionCell.self, forCellWithReuseIdentifier: MilkCollectionCell.id)
         collectionView.alwaysBounceVertical = true
         view.addSubview(collectionView)
     }
@@ -164,7 +150,7 @@ class FishProducts: UIViewController, UICollectionViewDelegate, UICollectionView
         
         // Список URL для попытки подключения
         let urls = [
-            Config.getFishURL,      // Основной URL
+            Config.getFishURL,  // Основной URL
             Config.productsURL, // Альтернативный эндпоинт
         ]
         
@@ -217,8 +203,8 @@ class FishProducts: UIViewController, UICollectionViewDelegate, UICollectionView
             
             switch result {
             case .success(let products):
-                // Фильтруем продукты по категории 1
-                let filteredProducts = products.filter { $0.category == 1 }
+                // Фильтруем продукты по категории 3
+                let filteredProducts = products.filter { $0.category == 3 }
                 
                 // Convert API products to CardInfo format
                 let cardInfoArray = filteredProducts.map { product in
@@ -306,7 +292,7 @@ class FishProducts: UIViewController, UICollectionViewDelegate, UICollectionView
             let name = String(cString: interface.ifa_name)
             
             // Filter out non-IP interfaces
-            guard interface.ifa_addr.pointee.sa_family == UInt8(AF_INET) || 
+            guard interface.ifa_addr.pointee.sa_family == UInt8(AF_INET) ||
                   interface.ifa_addr.pointee.sa_family == UInt8(AF_INET6) else { continue }
             
             // Convert interface address to a human readable string
@@ -322,23 +308,23 @@ class FishProducts: UIViewController, UICollectionViewDelegate, UICollectionView
     
     private func setupNotifications() {
         NotificationCenter.default.addObserver(
-            self, 
-            selector: #selector(updateProductData), 
-            name: Notification.Name(BasketManager.basketUpdatedNotification), 
+            self,
+            selector: #selector(updateProductData),
+            name: Notification.Name(BasketManager.basketUpdatedNotification),
             object: nil
         )
         
         NotificationCenter.default.addObserver(
-            self, 
-            selector: #selector(handleBasketChanges), 
-            name: Notification.Name(BasketManager.productQuantityChangedNotification), 
+            self,
+            selector: #selector(handleBasketChanges),
+            name: Notification.Name(BasketManager.productQuantityChangedNotification),
             object: nil
         )
         
         NotificationCenter.default.addObserver(
-            self, 
-            selector: #selector(handleProductRemoved), 
-            name: Notification.Name(BasketManager.productRemovedNotification), 
+            self,
+            selector: #selector(handleProductRemoved),
+            name: Notification.Name(BasketManager.productRemovedNotification),
             object: nil
         )
     }
@@ -383,7 +369,7 @@ class FishProducts: UIViewController, UICollectionViewDelegate, UICollectionView
                 displayDataSource[displayIndex].isInBasket = newQuantity > 0
                 
                 // Обновить ячейку, если она видима
-                if let cell = collectionView.cellForItem(at: IndexPath(item: displayIndex, section: 0)) as? FishCollectionCell {
+                if let cell = collectionView.cellForItem(at: IndexPath(item: displayIndex, section: 0)) as? MilkCollectionCell {
                     cell.configure(with: displayDataSource[displayIndex])
                 }
             } else {
@@ -407,7 +393,7 @@ class FishProducts: UIViewController, UICollectionViewDelegate, UICollectionView
                 cardsData[index].isInBasket = false
                 
                 // Обновляем UI для этой ячейки
-                if let cell = collectionView.cellForItem(at: IndexPath(item: index, section: 0)) as? FishCollectionCell {
+                if let cell = collectionView.cellForItem(at: IndexPath(item: index, section: 0)) as? MilkCollectionCell {
                     cell.configure(with: cardsData[index])
                 }
             }
@@ -430,7 +416,7 @@ class FishProducts: UIViewController, UICollectionViewDelegate, UICollectionView
                     displayDataSource[i].isInBasket = false
                     
                     // Обновляем ячейку если она видима
-                    if let cell = collectionView.cellForItem(at: IndexPath(item: i, section: 0)) as? FishCollectionCell {
+                    if let cell = collectionView.cellForItem(at: IndexPath(item: i, section: 0)) as? MilkCollectionCell {
                         cell.configure(with: displayDataSource[i])
                     }
                 }
@@ -502,7 +488,7 @@ class FishProducts: UIViewController, UICollectionViewDelegate, UICollectionView
                 }
                 
                 // Обновляем ячейку, если она видима
-                if let cell = collectionView.cellForItem(at: IndexPath(item: index, section: 0)) as? FishCollectionCell {
+                if let cell = collectionView.cellForItem(at: IndexPath(item: index, section: 0)) as? MilkCollectionCell {
                     cell.configure(with: cardsData[index])
             } else {
                     // Если хотя бы одна ячейка не видна, потребуется полная перезагрузка
@@ -547,14 +533,11 @@ class FishProducts: UIViewController, UICollectionViewDelegate, UICollectionView
         let basketController = BasketController()
         navigationController?.pushViewController(basketController, animated: true)
     }
-
-    
-
 }
 
 //MARK: - TableSettings
 
-extension FishProducts: CellDelegate, BasketCellDelegate {
+extension MilkController: CellDelegate, BasketCellDelegate {
     // MARK: - UICollectionViewDataSource
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -562,7 +545,7 @@ extension FishProducts: CellDelegate, BasketCellDelegate {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: FishCollectionCell.id, for: indexPath) as? FishCollectionCell else {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MilkCollectionCell.id, for: indexPath) as? MilkCollectionCell else {
             return UICollectionViewCell()
         }
         
@@ -593,9 +576,10 @@ extension FishProducts: CellDelegate, BasketCellDelegate {
             // Проверяем, не превышает ли текущее количество максимально доступное
             if currentQuantity < maxAvailableQuantity {
                 BasketManager.shared.updateQuantity(
-                    productId: productId, 
+                    productId: productId,
                     quantity: currentQuantity + 1,
-                    maxAvailable: maxAvailableQuantity, categoty: item.catId)
+                    maxAvailable: maxAvailableQuantity,
+                    categoty: item.catId)
                 
                 // Если после обновления достигнуто максимальное количество, обновляем UI ячейки
                 if currentQuantity + 1 >= maxAvailableQuantity {
@@ -613,7 +597,7 @@ extension FishProducts: CellDelegate, BasketCellDelegate {
                 if currentQuantity == 1 {
                     BasketManager.shared.removeFromBasket(productId: productId)
                 } else {
-                    BasketManager.shared.updateQuantity(productId: productId, quantity: currentQuantity - 1, categoty: item.catId)
+                    BasketManager.shared.updateQuantity(productId: productId, quantity: currentQuantity - 1,maxAvailable: maxAvailableQuantity, categoty: item.catId)
                 }
                 
                 // Если после уменьшения количество стало меньше максимального, показываем кнопку плюс
@@ -656,7 +640,7 @@ extension FishProducts: CellDelegate, BasketCellDelegate {
        let maxAvailableQuantity = item.productCount
        
        // Получаем текущее количество и увеличиваем на 1, если не превышает максимум
-       let currentQuantity = BasketManager.shared.quantityForProduct(productId: productId)
+        let currentQuantity = BasketManager.shared.quantityForProduct(productId: productId)
        
        if currentQuantity == 0 {
            // Если товара еще нет в корзине, добавляем его с проверкой максимального количества
@@ -664,7 +648,7 @@ extension FishProducts: CellDelegate, BasketCellDelegate {
        } else if currentQuantity < maxAvailableQuantity {
            // Если товар уже есть и не достигнут максимум, увеличиваем на 1
            BasketManager.shared.updateQuantity(
-               productId: productId, 
+               productId: productId,
                quantity: currentQuantity + 1,
                maxAvailable: maxAvailableQuantity, categoty: item.catId
            )
@@ -672,7 +656,7 @@ extension FishProducts: CellDelegate, BasketCellDelegate {
        
        // Обновляем UI ячейки если достигнуто максимальное количество
        if currentQuantity + 1 >= maxAvailableQuantity {
-           if let productCell = cell as? FishCollectionCell {
+           if let productCell = cell as? MilkCollectionCell {
                productCell.hideAddButton(true)
            }
        }

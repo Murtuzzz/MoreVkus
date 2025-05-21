@@ -17,7 +17,7 @@ class CatalogController: UIViewController {
     private let recomendationCollection = RecomendationCollection()
     private let sweetsCollection = RecomendationCollection()
     var unavailableInd: [Int] = []
-    let controllers = [FishProducts(),SausagesController(),FishProducts(),FishProducts(),FishProducts()]
+    let controllers = [FishProducts(),SausagesController(),MilkController(),FishProducts(),FishProducts()]
     
     private let basketButton: UIButton = {
         let button = UIButton()
@@ -156,8 +156,16 @@ class CatalogController: UIViewController {
 
         setupUI()
         setupNotifications()
-        UserSettings.orderDelivered = true
+        //UserSettings.orderDelivered = true
+        
+        UserSettings.activeOrder = nil
+        UserSettings.orderCanceled = nil
+        UserSettings.orderDelivered = nil
+        UserSettings.orderPaid = nil 
        
+        if UserSettings.activeOrder == nil {
+            UserSettings.activeOrder = false
+        }
         
         if UserSettings.orderDelivered == nil {
             UserSettings.orderDelivered = true

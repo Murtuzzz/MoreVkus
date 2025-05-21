@@ -113,8 +113,10 @@ class DeliveryController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        if !UserSettings.orderDelivered {
-            print("NoHidden")
+        print("UserSettings.activeOrder = \(UserSettings.activeOrder)")
+        
+        if UserSettings.activeOrder {
+            print("noActiveOrder")
             noDeliveryLabel.isHidden = true
             cancelButton.isHidden = false
             orderDetailsLabel.isHidden = false
@@ -125,7 +127,7 @@ class DeliveryController: UIViewController {
             paymentMethodView.isHidden = false
             paymentMethodLabel.isHidden = false
         } else {
-            print("Hidden")
+            print("ActiveOrder")
             noDeliveryLabel.isHidden = false
             cancelButton.isHidden = true
             orderDetailsLabel.isHidden = true
@@ -145,28 +147,6 @@ class DeliveryController: UIViewController {
         if UserSettings.orderPaid {
             startCheckingStatus()
         }
-        
-//        if !UserSettings.orderDelivered || !UserSettings.orderCanceled {
-//            noDeliveryLabel.isHidden = true
-//            cancelButton.isHidden = false
-//            orderDetailsLabel.isHidden = false
-//            orderDetailsView.isHidden = false
-//            mapView.isHidden = false
-//            addressView.isHidden = false
-//            addressLabel.isHidden = false
-//            paymentMethodView.isHidden = false
-//            paymentMethodLabel.isHidden = false
-//        } else {
-//            noDeliveryLabel.isHidden = false
-//            cancelButton.isHidden = true
-//            orderDetailsLabel.isHidden = true
-//            orderDetailsView.isHidden = true
-//            mapView.isHidden = true
-//            addressView.isHidden = true
-//            addressLabel.isHidden = true
-//            paymentMethodView.isHidden = true
-//            paymentMethodLabel.isHidden = true
-//        }
         
         setupUI()
         setupActions()
@@ -328,7 +308,9 @@ class DeliveryController: UIViewController {
                         self.timer?.invalidate()
                         self.timer = nil
                         DispatchQueue.main.async {
-                            UserSettings.orderDelivered = true
+                            UserSettings.orderPaid = false
+                            UserSettings.orderDelivered = deliveryStatus
+                            UserSettings.activeOrder = false
                             
                             self.navigationController?.popViewController(animated: true)
                             //self.doneButtonAction()
@@ -376,8 +358,8 @@ class DeliveryController: UIViewController {
         alert.addAction(UIAlertAction(title: "Отмена", style: .cancel))
         alert.addAction(UIAlertAction(title: "Да, отменить", style: .destructive) { [weak self] _ in
             // Возвращаемся на предыдущий экран
+            UserSettings.activeOrder = false
             UserSettings.orderCanceled = true
-            UserSettings.orderDelivered = true
             UserSettings.orderPaid = false
             UserSettings.orderInfo = []
             self!.timer?.invalidate()

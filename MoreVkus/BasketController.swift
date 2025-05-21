@@ -233,8 +233,7 @@ class BasketController: UIViewController, UITableViewDelegate, UITableViewDataSo
     }
     
     @objc private func checkoutButtonTapped() {
-        print(UserSettings.orderDelivered)
-        if UserSettings.orderDelivered == false {
+        if UserSettings.activeOrder == true {
             let alert = UIAlertController(
                 title: "Обработка",
                 message: "Дождитесь завершения предыдущего заказа",
@@ -283,7 +282,7 @@ class BasketController: UIViewController, UITableViewDelegate, UITableViewDataSo
             let deliveryController = DeliveryController()
             navigationController?.pushViewController(deliveryController, animated: true)
             UserSettings.orderPaid = true
-            UserSettings.orderDelivered = false 
+            UserSettings.activeOrder = true
         }
     }
     

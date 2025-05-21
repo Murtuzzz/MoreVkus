@@ -18,7 +18,7 @@ class CardInfoController: UIViewController {
     private let productImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.contentMode = .scaleAspectFill
+        imageView.contentMode = .scaleAspectFit
         imageView.layer.cornerRadius = 20
         imageView.clipsToBounds = true
         return imageView

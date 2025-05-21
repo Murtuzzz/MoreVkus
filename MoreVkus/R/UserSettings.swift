@@ -213,20 +213,20 @@ class UserSettings {
         }
     }
     
-//    static var activeOrder: Bool! {
-//        get {
-//            return UserDefaults.standard.bool(forKey: SettingsKeys.activeOrder.rawValue)
-//        } set {
-//            
-//            let defaults = UserDefaults.standard
-//            let key = SettingsKeys.activeOrder.rawValue
-//            if let today = newValue {
-//                defaults.set(today, forKey: key)
-//            } else {
-//                defaults.removeObject(forKey: key)
-//            }
-//        }
-    //    }
+    static var activeOrder: Bool! {
+        get {
+            return UserDefaults.standard.bool(forKey: SettingsKeys.activeOrder.rawValue)
+        } set {
+            
+            let defaults = UserDefaults.standard
+            let key = SettingsKeys.activeOrder.rawValue
+            if let today = newValue {
+                defaults.set(today, forKey: key)
+            } else {
+                defaults.removeObject(forKey: key)
+            }
+        }
+    }
     
     static var orderCanceled: Bool! {
         get {
