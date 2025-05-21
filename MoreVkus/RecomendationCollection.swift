@@ -37,12 +37,12 @@ final class RecomendationCollection: UIView, UICollectionViewDelegateFlowLayout,
         layout.minimumInteritemSpacing = 0
         layout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         
-        dataSource = [.init(title: "Молочные продукты", image: UIImage(named: "milk")!, categoryId: 1),
-                      .init(title: "Колбасы, сосиски",image: UIImage(named: "sosi")!,categoryId: 1),
-                      .init(title: "Полуфабрикаты", image: UIImage(named: "froz")!,categoryId: 1),
-                      .init(title: "Рыба", image: UIImage(named: "frzFish")!,categoryId: 1),
-                      .init(title: "Овощи", image: UIImage(named: "veget")!,categoryId: 1),
-                      .init(title: "Напитки", image: UIImage(named: "drinks")!, categoryId: 1),
+        dataSource = [.init(title: "Рыба", image: UIImage(named: "frzFish")!, categoryId: 1),
+                      .init(title: "Колбасы, сосиски",image: UIImage(named: "sosi")!,categoryId: 2),
+                      .init(title: "Полуфабрикаты", image: UIImage(named: "froz")!,categoryId: 3),
+                      .init(title: "Молочные продукты", image: UIImage(named: "milk")!,categoryId: 4),
+                      .init(title: "Овощи", image: UIImage(named: "veget")!,categoryId: 5),
+                      .init(title: "Напитки", image: UIImage(named: "drinks")!, categoryId: 6),
                       
         ]
         
@@ -105,8 +105,8 @@ extension RecomendationCollection {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let item = dataSource[indexPath.row]
         print(item.title)
-        UserSettings.currentController = item.categoryId
-       onCellTap?()
+        UserSettings.currentController = indexPath.row
+        onCellTap?()
     }
 }
 

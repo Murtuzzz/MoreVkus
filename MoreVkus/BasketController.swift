@@ -320,7 +320,8 @@ class BasketController: UIViewController, UITableViewDelegate, UITableViewDataSo
                     BasketManager.shared.updateQuantity(
                         productId: productId, 
                         quantity: currentQuantity + 1,
-                        maxAvailable: maxAvailableQuantity
+                        maxAvailable: maxAvailableQuantity,
+                        categoty: item.catId
                     )
                     
                     // Если после обновления достигнут максимум, скрываем кнопку
@@ -341,7 +342,7 @@ class BasketController: UIViewController, UITableViewDelegate, UITableViewDataSo
                 
                 if currentQuantity > 1 {
                     // Если количество больше 1, уменьшаем на 1
-                    BasketManager.shared.updateQuantity(productId: productId, quantity: currentQuantity - 1)
+                    BasketManager.shared.updateQuantity(productId: productId, quantity: currentQuantity - 1, categoty: item.catId)
                     
                     // Показываем кнопку увеличения, если она была скрыта
                     if currentQuantity >= maxAvailableQuantity {

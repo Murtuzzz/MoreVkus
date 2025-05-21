@@ -17,7 +17,7 @@ class CatalogController: UIViewController {
     private let recomendationCollection = RecomendationCollection()
     private let sweetsCollection = RecomendationCollection()
     var unavailableInd: [Int] = []
-    let controllers = [ProductsController(),ProductsController(),ProductsController(),ProductsController(),ProductsController()]
+    let controllers = [FishProducts(),SausagesController(),FishProducts(),FishProducts(),FishProducts()]
     
     private let basketButton: UIButton = {
         let button = UIButton()

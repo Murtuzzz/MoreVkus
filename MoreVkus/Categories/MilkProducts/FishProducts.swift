@@ -25,7 +25,7 @@ import Foundation
 import Darwin.POSIX.netdb
 import Darwin.POSIX.net
 
-class ProductsController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+class FishProducts: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
 
     private var collectionView: UICollectionView!
     private var basketInfoArray: [[BasketInfo]] = []
@@ -136,14 +136,14 @@ class ProductsController: UIViewController, UICollectionViewDelegate, UICollecti
         collectionView.backgroundColor = .clear
         collectionView.delegate = self
         collectionView.dataSource = self
-        collectionView.register(ProductsCollectionCell.self, forCellWithReuseIdentifier: ProductsCollectionCell.id)
+        collectionView.register(FishCollectionCell.self, forCellWithReuseIdentifier: FishCollectionCell.id)
         collectionView.alwaysBounceVertical = true
         view.addSubview(collectionView)
     }
     
     private func setupUI() {
         view.backgroundColor = R.Colors.background
-        title = "Products"
+        title = "Молочные продукты"
         
         view.addSubview(backgroundImage)
         view.addSubview(profileView)
@@ -164,7 +164,7 @@ class ProductsController: UIViewController, UICollectionViewDelegate, UICollecti
         
         // Список URL для попытки подключения
         let urls = [
-            Config.getURL,      // Основной URL
+            Config.getFishURL,      // Основной URL
             Config.productsURL, // Альтернативный эндпоинт
         ]
         
@@ -203,14 +203,25 @@ class ProductsController: UIViewController, UICollectionViewDelegate, UICollecti
         print("Trying URL: \(urlString)")
         
         // Make API request
+        fetchProducts(from: urlString, urls: urls, index: index)
+    }
+
+    private func fetchProducts(from urlString: String, urls: [String], index: Int) {
+        guard index < urls.count else {
+            print("All URLs failed")
+            return
+        }
+        
         NetworkService.shared.fetchProducts(from: urlString) { [weak self] result in
             guard let self = self else { return }
             
             switch result {
             case .success(let products):
-                // Successfully loaded products
+                // Фильтруем продукты по категории 1
+                let filteredProducts = products.filter { $0.category == 1 }
+                
                 // Convert API products to CardInfo format
-                let cardInfoArray = products.map { product in
+                let cardInfoArray = filteredProducts.map { product in
                     return CardInfo(
                         image: "\(product.name)", // Используем имя продукта для изображения
                         discription: product.description,
@@ -372,7 +383,7 @@ class ProductsController: UIViewController, UICollectionViewDelegate, UICollecti
                 displayDataSource[displayIndex].isInBasket = newQuantity > 0
                 
                 // Обновить ячейку, если она видима
-                if let cell = collectionView.cellForItem(at: IndexPath(item: displayIndex, section: 0)) as? ProductsCollectionCell {
+                if let cell = collectionView.cellForItem(at: IndexPath(item: displayIndex, section: 0)) as? FishCollectionCell {
                     cell.configure(with: displayDataSource[displayIndex])
                 }
             } else {
@@ -396,7 +407,7 @@ class ProductsController: UIViewController, UICollectionViewDelegate, UICollecti
                 cardsData[index].isInBasket = false
                 
                 // Обновляем UI для этой ячейки
-                if let cell = collectionView.cellForItem(at: IndexPath(item: index, section: 0)) as? ProductsCollectionCell {
+                if let cell = collectionView.cellForItem(at: IndexPath(item: index, section: 0)) as? FishCollectionCell {
                     cell.configure(with: cardsData[index])
                 }
             }
@@ -419,7 +430,7 @@ class ProductsController: UIViewController, UICollectionViewDelegate, UICollecti
                     displayDataSource[i].isInBasket = false
                     
                     // Обновляем ячейку если она видима
-                    if let cell = collectionView.cellForItem(at: IndexPath(item: i, section: 0)) as? ProductsCollectionCell {
+                    if let cell = collectionView.cellForItem(at: IndexPath(item: i, section: 0)) as? FishCollectionCell {
                         cell.configure(with: displayDataSource[i])
                     }
                 }
@@ -491,7 +502,7 @@ class ProductsController: UIViewController, UICollectionViewDelegate, UICollecti
                 }
                 
                 // Обновляем ячейку, если она видима
-                if let cell = collectionView.cellForItem(at: IndexPath(item: index, section: 0)) as? ProductsCollectionCell {
+                if let cell = collectionView.cellForItem(at: IndexPath(item: index, section: 0)) as? FishCollectionCell {
                     cell.configure(with: cardsData[index])
             } else {
                     // Если хотя бы одна ячейка не видна, потребуется полная перезагрузка
@@ -543,7 +554,7 @@ class ProductsController: UIViewController, UICollectionViewDelegate, UICollecti
 
 //MARK: - TableSettings
 
-extension ProductsController: CellDelegate, BasketCellDelegate {
+extension FishProducts: CellDelegate, BasketCellDelegate {
     // MARK: - UICollectionViewDataSource
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -551,7 +562,7 @@ extension ProductsController: CellDelegate, BasketCellDelegate {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ProductsCollectionCell.id, for: indexPath) as? ProductsCollectionCell else {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: FishCollectionCell.id, for: indexPath) as? FishCollectionCell else {
             return UICollectionViewCell()
         }
         
@@ -584,8 +595,7 @@ extension ProductsController: CellDelegate, BasketCellDelegate {
                 BasketManager.shared.updateQuantity(
                     productId: productId, 
                     quantity: currentQuantity + 1,
-                    maxAvailable: maxAvailableQuantity
-                )
+                    maxAvailable: maxAvailableQuantity, categoty: item.catId)
                 
                 // Если после обновления достигнуто максимальное количество, обновляем UI ячейки
                 if currentQuantity + 1 >= maxAvailableQuantity {
@@ -603,7 +613,7 @@ extension ProductsController: CellDelegate, BasketCellDelegate {
                 if currentQuantity == 1 {
                     BasketManager.shared.removeFromBasket(productId: productId)
                 } else {
-                    BasketManager.shared.updateQuantity(productId: productId, quantity: currentQuantity - 1)
+                    BasketManager.shared.updateQuantity(productId: productId, quantity: currentQuantity - 1, categoty: item.catId)
                 }
                 
                 // Если после уменьшения количество стало меньше максимального, показываем кнопку плюс
@@ -656,13 +666,13 @@ extension ProductsController: CellDelegate, BasketCellDelegate {
            BasketManager.shared.updateQuantity(
                productId: productId, 
                quantity: currentQuantity + 1,
-               maxAvailable: maxAvailableQuantity
+               maxAvailable: maxAvailableQuantity, categoty: item.catId
            )
        }
        
        // Обновляем UI ячейки если достигнуто максимальное количество
        if currentQuantity + 1 >= maxAvailableQuantity {
-           if let productCell = cell as? ProductsCollectionCell {
+           if let productCell = cell as? FishCollectionCell {
                productCell.hideAddButton(true)
            }
        }

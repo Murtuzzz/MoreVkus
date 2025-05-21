@@ -70,7 +70,7 @@ class BasketManager {
     }
     
     // Update quantity for a product
-    func updateQuantity(productId: Int, quantity: Int, maxAvailable: Int? = nil) {
+    func updateQuantity(productId: Int, quantity: Int, maxAvailable: Int? = nil, categoty: Int) {
         guard quantity >= 0 else { return }
         
         if quantity == 0 {

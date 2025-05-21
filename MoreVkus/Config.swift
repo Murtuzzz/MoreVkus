@@ -10,5 +10,7 @@ struct Config {
     #endif
     
     static let productsURL = "\(baseURL)/api/products"
-    static let getURL = "\(baseURL)/get-url"
-} 
+    //static let getURL = "\(baseURL)/get-url"
+    static let getFishURL = "\(baseURL)/get-fish-url"
+    static let getSausURL = "\(baseURL)/get-saus-url"
+}

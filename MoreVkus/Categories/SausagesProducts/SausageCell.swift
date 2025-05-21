@@ -7,17 +7,9 @@
 
 import UIKit
 
-protocol CellDelegate: AnyObject {
-    func infoButtonTapped(cell: UICollectionViewCell)
-}
+final class SausagesCollectionCell: UICollectionViewCell {
 
-protocol BasketCellDelegate: AnyObject {
-    func didTapBasketButton(inCell cell: UICollectionViewCell)
-}
-
-final class ProductsCollectionCell: UICollectionViewCell {
-
-    static var id = "ProductsCollectionCell"
+    static var id = "SausagesCollectionCell"
 
     private var prodId = 0
     private var prodCount = 0
@@ -328,7 +320,7 @@ final class ProductsCollectionCell: UICollectionViewCell {
     }
 }
 
-extension ProductsCollectionCell {
+extension SausagesCollectionCell {
     func blurEffect(someView: UIView) {
         // Создание объекта `UIBlurEffect` со стилем эффекта.
             // .extraLight, .light, .dark, .regular и .prominent - на выбор в зависимости от желаемого эффекта.

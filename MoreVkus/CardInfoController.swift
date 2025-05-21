@@ -18,7 +18,8 @@ class CardInfoController: UIViewController {
     private let productImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.contentMode = .scaleAspectFit
+        imageView.contentMode = .scaleAspectFill
+        imageView.layer.cornerRadius = 20
         imageView.clipsToBounds = true
         return imageView
     }()
@@ -44,7 +45,7 @@ class CardInfoController: UIViewController {
     private let priceLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = R.Fonts.avenirBold(with: 24)
+        label.font = R.Fonts.avenirBook(with: 24)
         label.textColor = .black
         return label
     }()
@@ -78,7 +79,8 @@ class CardInfoController: UIViewController {
     private let addButton: UIButton = {
         let button = UIButton(type: .system)
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.setImage(UIImage(systemName: "plus.circle.fill"), for: .normal)
+        button.setImage(UIImage(systemName: "plus"), for: .normal)
+        button.layer.cornerRadius = 10
         button.tintColor = .systemBlue
         return button
     }()
@@ -86,7 +88,8 @@ class CardInfoController: UIViewController {
     private let removeButton: UIButton = {
         let button = UIButton(type: .system)
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.setImage(UIImage(systemName: "minus.circle.fill"), for: .normal)
+        button.setImage(UIImage(systemName: "minus"), for: .normal)
+        button.layer.cornerRadius = 10
         button.tintColor = .systemBlue
         return button
     }()
@@ -125,7 +128,6 @@ class CardInfoController: UIViewController {
     
     private func setupUI() {
         view.backgroundColor = .white
-        title = "Информация о товаре"
         
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)
@@ -158,7 +160,7 @@ class CardInfoController: UIViewController {
             productImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 16),
             productImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             productImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            productImageView.heightAnchor.constraint(equalToConstant: 200),
+            productImageView.heightAnchor.constraint(equalToConstant: view.bounds.height/3.5),
             
             titleLabel.topAnchor.constraint(equalTo: productImageView.bottomAnchor, constant: 16),
             titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
@@ -174,10 +176,11 @@ class CardInfoController: UIViewController {
             stockLabel.centerYAnchor.constraint(equalTo: priceLabel.centerYAnchor),
             stockLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             
-            basketView.topAnchor.constraint(equalTo: priceLabel.bottomAnchor, constant: 16),
+            basketView.topAnchor.constraint(equalTo: basketView.bottomAnchor, constant: 16),
             basketView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             basketView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             basketView.heightAnchor.constraint(equalToConstant: 50),
+            basketView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -16),
             
             quantityLabel.centerXAnchor.constraint(equalTo: basketView.centerXAnchor),
             quantityLabel.centerYAnchor.constraint(equalTo: basketView.centerYAnchor),
@@ -188,7 +191,7 @@ class CardInfoController: UIViewController {
             removeButton.centerYAnchor.constraint(equalTo: basketView.centerYAnchor),
             removeButton.leadingAnchor.constraint(equalTo: basketView.leadingAnchor, constant: 16),
             
-            basketButton.topAnchor.constraint(equalTo: basketView.bottomAnchor, constant: 16),
+            basketButton.topAnchor.constraint(equalTo: priceLabel.bottomAnchor, constant: 16),
             basketButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             basketButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             basketButton.heightAnchor.constraint(equalToConstant: 50),
@@ -223,8 +226,17 @@ class CardInfoController: UIViewController {
         
         productImageView.image = UIImage(named: product.image)
         titleLabel.text = product.title
-        descriptionLabel.text = product.discription
-        priceLabel.text = "\(product.price) ₽"
+        descriptionLabel.text = """
+    🎣 \(product.discription)
+    
+    💡 Идеально подходит для:
+    ✔ Ужинов в кругу семьи
+    ✔ Званых ужинов и праздничного стола
+    ✔ ЗОЖ-питания и спортивного рациона
+    ✔ Любителей вкусной и полезной еды
+    
+    """
+        priceLabel.text = "\(product.price) ₽ /кг"
         stockLabel.text = product.inStock ? "В наличии" : "Нет в наличии"
         maxAvailable = product.productCount
         
@@ -271,7 +283,7 @@ class CardInfoController: UIViewController {
         BasketManager.shared.updateQuantity(
             productId: product.prodId,
             quantity: currentQuantity,
-            maxAvailable: maxAvailable
+            maxAvailable: maxAvailable, categoty: product.catId
         )
     }
     
@@ -284,7 +296,7 @@ class CardInfoController: UIViewController {
         BasketManager.shared.updateQuantity(
             productId: product.prodId,
             quantity: currentQuantity,
-            maxAvailable: maxAvailable
+            maxAvailable: maxAvailable, categoty: product.catId
         )
     }
     
