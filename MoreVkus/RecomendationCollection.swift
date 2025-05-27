@@ -84,7 +84,7 @@ extension RecomendationCollection {
         
         cell.configure(label: item.title, image: item.image, categoryId: 1)
         
-        cell.layer.shadowColor = UIColor.systemGray3.cgColor
+        cell.layer.shadowColor = R.Colors.silver.cgColor
         cell.layer.shadowOpacity = 0.5;
         cell.layer.shadowRadius = 5.0;
         cell.layer.shadowOffset = CGSizeMake(4, 4);

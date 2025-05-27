@@ -15,7 +15,9 @@ enum R {
         static let active = UIColor(hexString: "#4870FF")
         static let inactive = UIColor(hexString: "#8E8E93")
         //static let background = UIColor(hexString: "#121516")
-        static let background = UIColor.white
+        static let background = UIColor.white//UIColor(hexString: "#f5f6fa")
+        static let white = UIColor(hexString: "#ecf0f1")
+        static let silver = UIColor(hexString: "#bdc3c7")
         static let bar = UIColor(hexString: "#1C1E1F")
         //static let barBg = UIColor(hexString: "#252627")
         static let barBg = UIColor.systemGray6

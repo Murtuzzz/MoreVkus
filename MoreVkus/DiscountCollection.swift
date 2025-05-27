@@ -11,6 +11,7 @@ import UIKit
 struct DiscountItems {
     let title: String
     let image: UIImage
+    let discount: Bool
 }
 
 final class DiscountCollectionView: UIView, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
@@ -36,8 +37,8 @@ final class DiscountCollectionView: UIView, UICollectionViewDelegateFlowLayout, 
         layout.minimumLineSpacing = 5
         layout.minimumInteritemSpacing = 5
         
-        dataSource = [.init(title: "Привелегии Мой SPAR", image: UIImage(named: "poster")!),
-                      .init(title: "Мы в соцсетях", image: UIImage(named: "poster")!),
+        dataSource = [.init(title: "Привелегии Мой SPAR", image: UIImage(named: "Image")!, discount: false),
+                      .init(title: "Мы в соцсетях", image: UIImage(named: "poster")!, discount: true),
                       
         ]
         
@@ -51,6 +52,7 @@ final class DiscountCollectionView: UIView, UICollectionViewDelegateFlowLayout, 
         collectionView.dataSource = self
         collectionView.delegate = self
         collectionView.showsHorizontalScrollIndicator = false
+        collectionView.isPagingEnabled = true
         
         addSubview(collectionView)
         
@@ -77,14 +79,14 @@ extension DiscountCollectionView {
         
         let item = dataSource[indexPath.row]
         
-        cell.configure(label: item.title, image: item.image)
+        cell.configure(label: item.title, image: item.image, discount: item.discount)
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
-        CGSize(width: collectionView.bounds.width - 40, height: 174)
+        CGSize(width: collectionView.bounds.width, height: 174)
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {

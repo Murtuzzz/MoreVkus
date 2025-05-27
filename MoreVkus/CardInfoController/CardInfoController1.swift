@@ -24,7 +24,7 @@ final class CardInfoController1: UIViewController {
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setImage(UIImage(named: "arrowLeft")!.withRenderingMode(.alwaysTemplate), for: .normal)
         button.layer.masksToBounds = true
-        button.tintColor = .white
+        button.tintColor = .white 
         return button
     }()
     

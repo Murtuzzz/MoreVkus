@@ -107,9 +107,19 @@ class DiscountCollectionCell: UICollectionViewCell {
         
     }
     
-    public func configure(label: String, image: UIImage) {
+    public func configure(label: String, image: UIImage, discount: Bool) {
         mainLabel.text = label
         imageViewBackground.image = image
+        
+        if !discount {
+            infoViewOne.isHidden = true
+            infoLabelOne.isHidden = true
+            infoViewTwo.isHidden = true
+            infoLabelTwo.isHidden = true
+        } else {
+            
+        }
+       
         
     }
     
@@ -142,7 +152,8 @@ class DiscountCollectionCell: UICollectionViewCell {
             imageViewBackground.bottomAnchor.constraint(equalTo: bottomAnchor),
             imageViewBackground.topAnchor.constraint(equalTo: topAnchor),
             
-            imageView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: 72),
+            imageView.bottomAnchor.constraint(equalTo: container.bottomAnchor),
+            imageView.topAnchor.constraint(equalTo: container.topAnchor),
             imageView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
             imageView.heightAnchor.constraint(equalToConstant: 200),
             imageView.widthAnchor.constraint(equalTo: imageView.heightAnchor),

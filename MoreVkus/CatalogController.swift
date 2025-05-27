@@ -17,7 +17,7 @@ class CatalogController: UIViewController {
     private let recomendationCollection = RecomendationCollection()
     private let sweetsCollection = RecomendationCollection()
     var unavailableInd: [Int] = []
-    let controllers = [FishProducts(),SausagesController(),MilkController(),FishProducts(),FishProducts()]
+    let controllers = [FishProducts(),SausagesController(),MilkController(),FrozenController(), VegetablesController(), DrinksController()]
     
     private let basketButton: UIButton = {
         let button = UIButton()
@@ -287,7 +287,7 @@ class CatalogController: UIViewController {
             contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
             contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             contentView.widthAnchor.constraint(equalTo: view.widthAnchor),
-            contentView.heightAnchor.constraint(equalToConstant: 1600),
+            contentView.heightAnchor.constraint(equalToConstant: view.bounds.height),
             
             scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -336,10 +336,11 @@ class CatalogController: UIViewController {
             deliveryButton.heightAnchor.constraint(equalToConstant: 56),
             deliveryButton.widthAnchor.constraint(equalTo: deliveryButton.heightAnchor),
             
-            discountCollection.topAnchor.constraint(equalTo: middleView.topAnchor, constant: 104),
+            discountCollection.topAnchor.constraint(equalTo: basketView.bottomAnchor, constant: 16),
             discountCollection.leadingAnchor.constraint(equalTo: middleView.leadingAnchor,constant: 8),
+            discountCollection.trailingAnchor.constraint(equalTo: middleView.trailingAnchor,constant: -8),
             discountCollection.widthAnchor.constraint(equalToConstant: view.bounds.width),
-            discountCollection.heightAnchor.constraint(equalToConstant: 174),
+            discountCollection.heightAnchor.constraint(equalToConstant: view.bounds.height/4),
             
             basketButton.trailingAnchor.constraint(equalTo: basketView.trailingAnchor, constant: 8),
             basketButton.centerYAnchor.constraint(equalTo: basketView.centerYAnchor),
